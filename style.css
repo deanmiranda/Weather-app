@@ -1,0 +1,22 @@
+.weather {
+    background-color: lightcyan;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin: 0 auto;
+    text-align: center;
+    max-width: 35%;
+    min-height: 500px;
+    justify-content: center;
+}
+
+.cityInput,
+.weatherTitle,
+.weatherResults {
+    margin: 10px 0;
+}
+
+.weatherResultsWrapper {
+    margin: 50px auto;
+    width: 100%;
+}

@@ -8,6 +8,11 @@ let fahrenheit;
 function callWeather(e) {
     e.preventDefault();
     let cityInput = document.querySelector(".cityInput").value;
+    // check if city is in local storage, dont call api again if it is.
+    if (cityInput === localStorage.getItem('city')) {
+        location.reload();
+        alert('You already checked this city');
+    }
     let apiLink = `https://api.openweathermap.org/data/2.5/forecast?q=${cityInput}&cnt=30&appid=8c2815b4840aae521bf9478cec747275`;
 
     fetch(apiLink).then(function(response) {
@@ -16,7 +21,7 @@ function callWeather(e) {
         console.log(data);
         drawWeather(data);
     }).catch(function(err) {
-        alert('City not found, please try again.');
+        console.log('City not found, please try again.');
     });
 }
 
@@ -69,19 +74,19 @@ function drawWeather(d) {
     buildForecastList(d);
 }
 
-// Forecast HTML
-
-let forecastDate = document.querySelectorAll('.forecastResultsDate');
-let forecastIcon = document.querySelectorAll('.forecastResultsIconImage');
-let forecastTemp = document.querySelectorAll('.forecastResultsTemp');
-let forecastHumidity = document.querySelectorAll('.forecastResultsHumidity');
-let forecastWind = document.querySelectorAll('.forecastResultsWind');
 
 
 // Need 5 day forecast
 //  .weatherFutureButton shouldn't call the API again.. only use the data thats currently available to produce 5 day look ahead
 
 function buildForecastList(data) {
+    // Forecast HTML
+    let forecastDate = document.querySelectorAll('.forecastResultsDate');
+    let forecastIcon = document.querySelectorAll('.forecastResultsIconImage');
+    let forecastTemp = document.querySelectorAll('.forecastResultsTemp');
+    let forecastHumidity = document.querySelectorAll('.forecastResultsHumidity');
+    let forecastWind = document.querySelectorAll('.forecastResultsWind');
+
     let forecastLength = data.list.length;
     let date = [];
     let wind = [];
@@ -103,29 +108,26 @@ function buildForecastList(data) {
             temp.push(fahrenheit);
             humidity.push(data.list[index].main.humidity);
             wind.push(data.list[index].wind.speed);
+
+            forecastDate.forEach((el, index) => {
+                forecastDate[index].innerHTML = date[index];
+            });
+            forecastIcon.forEach((el, index) => {
+                forecastIcon[index].src = `http://openweathermap.org/img/w/${icon[index]}.png`;
+            });
+            forecastTemp.forEach((el, index) => {
+                forecastTemp[index].innerHTML = temp[index];
+            });
+            forecastHumidity.forEach((el, index) => {
+                forecastHumidity[index].innerHTML = humidity[index];
+            });
+            forecastWind.forEach((el, index) => {
+                forecastWind[index].innerHTML = wind[index];
+            });
         }
     }
         
     // find the forecast divs in the dom and loop thru them and add the data from each date using the index.
-    forecastDate.forEach((el, index) => {
-        el.append(date[index]);
-    });
-
-    forecastIcon.forEach((el, index) => {
-        el.src = `http://openweathermap.org/img/w/${icon[index]}.png`;
-    });
-
-    forecastTemp.forEach((el, index) => {
-        el.append(temp[index]);
-    });
-
-    forecastHumidity.forEach((el, index) => {
-        el.append(humidity[index]);
-    });
-
-    forecastWind.forEach((el, index) => {
-        el.append(wind[index]);
-    });
 }
 
 

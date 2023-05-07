@@ -11,14 +11,17 @@ print weather conditions from api to html
 Requirements are given by the api:
 
 Rquirements are 
+
 City name
 date
 icon for conditions
 temp 
 humidity
 wind speed
+
 Create a button to view 5-day 
 on click, present 5-day forecast displays:
+
 date
 icon for conditions
 temp

@@ -72,3 +72,26 @@
     display: flex;
     place-content: space-between;
 }
+
+.history {
+    width: 100%;
+    margin: 40px 0;
+}
+
+.historyWrapper {
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+}
+
+.historyLink {
+    margin: 10px 0;
+}
+
+.clearHistory {
+    background-color: lightcoral;
+}
+
+button {
+    border-radius: 20px;
+}

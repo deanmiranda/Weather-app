@@ -1,13 +1,30 @@
 
 const weatherButton = document.querySelector(".checkWeatherButton");
 weatherButton.addEventListener('click', callWeather);
+
 const weather = document.querySelector('.weatherResults');
 let fahrenheit;
+
+const clearStorageButton = document.querySelector(".clearHistory");
+clearStorageButton.addEventListener('click', clearHistory);
+
+let history = document.querySelector('.history');
+let historyLinks = document.querySelectorAll('.historyLink');
+let historyLinksLength = historyLinks.length;
+
+// Creating Stores
+let localStore = localStorage.getItem("Today");
+var localStoreParsed = JSON.parse(localStore);
+
+if(localStoreParsed) {
+    showHistory(localStoreParsed);
+    createHistoryButton();
+}
 
 // Use weather API
 function callWeather(e) {
     e.preventDefault();
-    const APP_API = '8c2815b4840aae521bf9478cec747275';
+    const APP_API = 'Put openWeatherAPI key here';
     let cityInput = document.querySelector(".cityInput").value;
     // check if city is in local storage, dont call api again if it is.
     if (cityInput === localStorage.getItem('city')) {
@@ -76,25 +93,6 @@ function drawWeather(d) {
     buildForecastList(d);
 }
 
-var weatherToday = [];
-var weatherForecast = [];
-
-function store(item) {
-    weatherToday.push(item);
-    localStorage.setItem("Today", JSON.stringify(weatherToday));
-}
-
-function storeForecast(item) {
-    weatherForecast.push(item);
-    localStorage.setItem("Forecast", JSON.stringify(weatherForecast));
-}
-
-
-
-
-// Need 5 day forecast
-//  .weatherFutureButton shouldn't call the API again.. only use the data thats currently available to produce 5 day look ahead
-
 function buildForecastList(data) {
     // Forecast HTML
     let forecastDate = document.querySelectorAll('.forecastResultsDate');
@@ -109,6 +107,7 @@ function buildForecastList(data) {
     let icon = [];
     let temp = [];
     let humidity = [];
+    createHistoryButton();
 
     for (var index = 0; index < forecastLength; index++) {
         // get the next 30 3 hour chunks of weather data... divide by 6 to get 5 "days" worth? it almost works? 
@@ -160,4 +159,58 @@ function buildForecastList(data) {
     // find the forecast divs in the dom and loop thru them and add the data from each date using the index.
 }
 
+function createHistoryButton() {
+    showHistory();
+    // get city name to add to button
+    let localStore = localStorage.getItem("Today");
+    var localStoreParsed = JSON.parse(localStore);
+    let cityName = localStoreParsed[0];
 
+    let historyWrapper = document.querySelector('.historyWrapper');
+    historyWrapper.innerHTML +=`<button class="historyLink historyLink-${cityName}">${cityName}</button>`;
+    
+    console.log(historyLinksLength);
+
+    for(var index = 0; index < historyLinksLength; index++) {
+        let newButton = document.querySelector(`.historyLink-${cityName}`);
+        newButton.addEventListener('click', showHistory(cityName));
+    }
+
+}
+// Create button from search history and populate html with data from local storage.
+
+var weatherToday = [];
+var weatherForecast = [];
+
+function store(item) {
+    weatherToday.push(item);
+    localStorage.setItem("Today", JSON.stringify(weatherToday));
+}
+
+function storeForecast(item) {
+    weatherForecast.push(item);
+    localStorage.setItem("Forecast", JSON.stringify(weatherForecast));
+}
+
+// Need 5 day forecast
+//  .weatherFutureButton shouldn't call the API again.. only use the data thats currently available to produce 5 day look ahead
+
+
+function showHistory(name) {
+    // Remove display none from div
+    const history = document.querySelector('.history');
+    console.log('it works', name);
+    history.classList.remove('d-none');
+}
+
+function clearHistory() {
+    history.classList.add('d-none');
+    localStorage.clear();
+}
+
+
+// Current issues 
+// Clear Storage is clearing the browser storage but it isn't working on click because the arrays are saving the data.
+
+// I'm not getting the city name correclty on the Search history buttons when I populate the button, I need to figure out how to "getItem" from local storage for the buttons
+// After that I can repopulate the today/5-day forecast in the main container.

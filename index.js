@@ -7,13 +7,14 @@ let fahrenheit;
 // Use weather API
 function callWeather(e) {
     e.preventDefault();
+    const APP_API = '8c2815b4840aae521bf9478cec747275';
     let cityInput = document.querySelector(".cityInput").value;
     // check if city is in local storage, dont call api again if it is.
     if (cityInput === localStorage.getItem('city')) {
         location.reload();
         alert('You already checked this city');
     }
-    let apiLink = `https://api.openweathermap.org/data/2.5/forecast?q=${cityInput}&cnt=30&appid=8c2815b4840aae521bf9478cec747275`;
+    let apiLink = `https://api.openweathermap.org/data/2.5/forecast?q=${cityInput}&cnt=30&appid=${APP_API}`;
 
     fetch(apiLink).then(function(response) {
         return response.json();
@@ -54,6 +55,7 @@ function drawWeather(d) {
 
     // Add the below data points to my local storage.
 
+    // Populate HTML
 	document.querySelector('.weatherResultsCity').innerHTML = d.city.name;
     document.querySelector('.weatherResultsDate').innerHTML = fixedDate;
 	document.querySelector('.weatherResultsIcon').src = `http://openweathermap.org/img/w/${d.list[0].weather[0].icon}.png`;
@@ -61,18 +63,32 @@ function drawWeather(d) {
     document.querySelector('.weatherResultsHumidity').innerHTML = d.list[0].main.humidity + '%';
     document.querySelector('.weatherResultsWind').innerHTML = d.list[0].wind.speed + ' mph';
 
-    localStorage.setItem('city', d.city.name);
-    localStorage.setItem('date', newDate);
-    localStorage.setItem('icon', d.list[0].weather[0].icon);
-    localStorage.setItem('temp', fahrenheit);
-    localStorage.setItem('humidity', d.list[0].main.humidity);
-    localStorage.setItem('wind', d.list[0].wind.speed);
-
+    // Set data to storage
+    store(d.city.name);
+    store(newDate);
+    store(d.list[0].weather[0].icon);
+    store(fahrenheit);
+    store(d.list[0].main.humidity);
+    store(d.list[0].wind.speed);
 
     // create a for each loop and distribute the data across an array for the 5 day forecast
 
     buildForecastList(d);
 }
+
+var weatherToday = [];
+var weatherForecast = [];
+
+function store(item) {
+    weatherToday.push(item);
+    localStorage.setItem("Today", JSON.stringify(weatherToday));
+}
+
+function storeForecast(item) {
+    weatherForecast.push(item);
+    localStorage.setItem("Forecast", JSON.stringify(weatherForecast));
+}
+
 
 
 
@@ -103,12 +119,24 @@ function buildForecastList(data) {
             // swap day/month/year in date format
             let datearray = dateNoTime.split("-");
             let fixedDate = datearray[1] + '/' + datearray[2] + '/' + datearray[0];
+            
+            // Update Arrays and Local storage
             date.push(fixedDate);
-            icon.push(data.list[index].weather[0].icon);
-            temp.push(fahrenheit);
-            humidity.push(data.list[index].main.humidity);
-            wind.push(data.list[index].wind.speed);
+            storeForecast(fixedDate);
 
+            icon.push(data.list[index].weather[0].icon);
+            storeForecast(data.list[index].weather[0].icon);
+
+            temp.push(fahrenheit);
+            storeForecast(fahrenheit);
+
+            humidity.push(data.list[index].main.humidity);
+            storeForecast(data.list[index].main.humidity);
+
+            wind.push();
+            storeForecast(data.list[index].wind.speed);
+
+            // Populate HTML fields
             forecastDate.forEach((el, index) => {
                 forecastDate[index].innerHTML = date[index];
             });
@@ -125,7 +153,9 @@ function buildForecastList(data) {
                 forecastWind[index].innerHTML = wind[index];
             });
         }
+        
     }
+    // console.log('stored weather object', weatherForecast);
         
     // find the forecast divs in the dom and loop thru them and add the data from each date using the index.
 }

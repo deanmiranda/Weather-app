@@ -17,6 +17,7 @@
 
 .weatherCityDetails {
     display: flex;
+    align-items: center;
 }
 
 .weatherCityDetails > div {
@@ -33,11 +34,13 @@
     font-weight: bold;
     font-size: 24px;
 }
+
 .weatherResultsDate {}
+
 .weatherResultsIcon {
-    width: 25px;
-    height: 25px;
+    width: 75px;
 }
+
 .weatherResultsHumidity {}
 .weatherResultsWind {}
 

@@ -8,7 +8,8 @@ weatherButton.addEventListener('click', function() {
 
 function callWeather() {
     let cityInput = document.querySelector(".cityInput").value;
-    let apiLink = `https://api.openweathermap.org/data/2.5/forecast?q=${cityInput}&cnt=5&appid=8c2815b4840aae521bf9478cec747275`;
+    // this is where I should put the weather api key
+    let apiLink = `https://api.openweathermap.org/data/2.5/forecast?q=${cityInput}&cnt=5&appid=(removeparenthesis and put openweather key here)`;
 
     fetch(apiLink).then(function(response) {
         return response.json();
@@ -54,7 +55,7 @@ function drawWeather(d) {
  
 }
 
-// Need 5 day forecast 
+// Need 5 day forecast
 //  .weatherFutureButton shouldn't call the API again.. only use the data thats currently available to produce 5 day look ahead
 
 // Need future and current Weather for the city

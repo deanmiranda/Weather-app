@@ -14,7 +14,7 @@ Rquirements are
 City name
 date
 icon for conditions
-temp
+temp 
 humidity
 wind speed
 Create a button to view 5-day 

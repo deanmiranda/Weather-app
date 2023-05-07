@@ -1,31 +1,32 @@
 
-const weatherButton = document.querySelector(".weatherButton");
+const weatherButton = document.querySelector(".checkWeatherButton");
+weatherButton.addEventListener('click', callWeather);
+const weather = document.querySelector('.weatherResults');
+weather.classList.remove('d-none');
 
-
-weatherButton.addEventListener('click', function() {
-    callWeather();
-});
-
-function callWeather() {
+function callWeather(e) {
+    e.preventDefault();
     let cityInput = document.querySelector(".cityInput").value;
-    // this is where I should put the weather api key
-    let apiLink = `https://api.openweathermap.org/data/2.5/forecast?q=${cityInput}&cnt=5&appid=(removeparenthesis and put openweather key here)`;
+    let apiLink = `https://api.openweathermap.org/data/2.5/forecast?q=${cityInput}&cnt=5&appid=8c2815b4840aae521bf9478cec747275`;
 
     fetch(apiLink).then(function(response) {
         return response.json();
     }).then(function(data) {
-        console.log('this is the data', data);
+        console.log(data);
         drawWeather(data);
     }).catch(function(err) {
         alert('City not found, please try again.');
-	    console.warn('Something went wrong.', err);
     });
 }
 
 function drawWeather(d) {
-    console.log('drawWeather function');
+    const checkForecastButton = document.querySelector('.checkForecastButton');
+    checkForecastButton.classList.remove('d-none');
+    checkForecastButton.addEventListener('click', showForecast);
+
     // Function to change kelvin to fahrenheit
 	var fahrenheit = Math.round(((parseFloat(d.list[0].main.temp)-273.15)*1.8)+32); 
+
     // Html changes
     // Changing time from date.time now to time in city using offset, needs fix for offset, showing three hours early
     date = new Date()
@@ -52,7 +53,22 @@ function drawWeather(d) {
     localStorage.setItem('temp', fahrenheit);
     localStorage.setItem('humidity', d.list[0].main.humidity);
     localStorage.setItem('wind', d.list[0].wind.speed);
- 
+
+
+    // create a for each loop and distribute the data across an array for the 5 day forecast
+
+    // // 
+    // let forecast = data.city.list;
+    // forecast.forEach(function (day, index) {
+    //     console.log(day);
+    //     console.log(index);
+    // });
+}
+
+function showForecast() {
+    const forecast = document.querySelector('.forecastResults');
+    console.log('should show forecast');
+    forecast.classList.remove('d-none');
 }
 
 // Need 5 day forecast

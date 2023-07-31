@@ -84,6 +84,10 @@
     flex-direction: column;
 }
 
+button {
+    margin-bottom: 10px;
+}
+
 .historyLink {
     margin: 10px 0;
 }
@@ -94,4 +98,12 @@
 
 button {
     border-radius: 20px;
+}
+
+.checkWeatherButton {
+    margin-bottom: 20px;
+}
+
+.error {
+    color: darkred;
 }

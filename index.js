@@ -1,30 +1,13 @@
 
 const weatherButton = document.querySelector(".checkWeatherButton");
 weatherButton.addEventListener('click', callWeather);
-
 const weather = document.querySelector('.weatherResults');
 let fahrenheit;
-
-const clearStorageButton = document.querySelector(".clearHistory");
-clearStorageButton.addEventListener('click', clearHistory);
-
-let history = document.querySelector('.history');
-let historyLinks = document.querySelectorAll('.historyLink');
-let historyLinksLength = historyLinks.length;
-
-// Creating Stores
-let localStore = localStorage.getItem("Locations");
-var localStoreParsed = JSON.parse(localStore);
-
-if(localStoreParsed) {
-    showHistory(localStoreParsed);
-    createHistoryButton(localStore);
-}
 
 // Use weather API
 function callWeather(e) {
     e.preventDefault();
-    const APP_API = '8c2815b4840aae521bf9478cec747275';
+    const APP_API = '';
     let cityInput = document.querySelector(".cityInput").value;
     // check if city is in local storage, dont call api again if it is.
     if (cityInput === localStorage.getItem('city')) {
@@ -38,7 +21,10 @@ function callWeather(e) {
     }).then(function(data) {
         console.log(data);
         drawWeather(data);
+        createHistoryButton();
+        hideError();
     }).catch(function(err) {
+        showError();
         console.log('City not found, please try again.', err);
     });
 }
@@ -48,7 +34,7 @@ function convertTemp(d) {
 	fahrenheit = Math.round(((parseFloat(d.list[0].main.temp)-273.15)*1.8)+32); 
 }
 
-// Need to get data for future and current Weather for the city
+// Get data for future and current Weather for the city
 
 function drawWeather(d) {
     weather.classList.remove('d-none');
@@ -72,28 +58,49 @@ function drawWeather(d) {
 
     // Add the below data points to my local storage.
 
-    // Populate HTML
 	document.querySelector('.weatherResultsCity').innerHTML = d.city.name;
     document.querySelector('.weatherResultsDate').innerHTML = fixedDate;
 	document.querySelector('.weatherResultsIcon').src = `http://openweathermap.org/img/w/${d.list[0].weather[0].icon}.png`;
     document.querySelector('.weatherResultsTemp').innerHTML = fahrenheit + '&deg;';
     document.querySelector('.weatherResultsHumidity').innerHTML = d.list[0].main.humidity + '%';
     document.querySelector('.weatherResultsWind').innerHTML = d.list[0].wind.speed + ' mph';
-
-    // Set data to storage
-    storeLocations(d.city.name)
-    store(d.city.name);
-    store(newDate);
-    store(d.list[0].weather[0].icon);
-    store(fahrenheit);
-    store(d.list[0].main.humidity);
-    store(d.list[0].wind.speed);
+    storeCity(d.city.name)
+     // Store the forecast data in localStorage
+    storeForecast({
+        date: fixedDate,
+        icon: d.list[0].weather[0].icon,
+        temp: fahrenheit,
+        humidity: d.list[0].main.humidity,
+        wind: d.list[0].wind.speed
+    });
 
     // create a for each loop and distribute the data across an array for the 5 day forecast
-
     buildForecastList(d);
 }
 
+function storeCity(cityName) {
+    let cities = getCitiesFromStorage();
+    cities.push(cityName);
+    localStorage.setItem("Cities", JSON.stringify(cities));
+}
+
+function storeForecast(forecastData) {
+    let forecasts = getForecastsFromStorage();
+    forecasts.push(forecastData);
+    localStorage.setItem("Forecasts", JSON.stringify(forecasts));
+}
+
+function getCitiesFromStorage() {
+    let cities = localStorage.getItem("Cities");
+    return cities ? JSON.parse(cities) : [];
+}
+
+function getForecastsFromStorage() {
+    let forecasts = localStorage.getItem("Forecasts");
+    return forecasts ? JSON.parse(forecasts) : [];
+}
+
+// Create Forecast for 5 days
 function buildForecastList(data) {
     // Forecast HTML
     let forecastDate = document.querySelectorAll('.forecastResultsDate');
@@ -108,7 +115,6 @@ function buildForecastList(data) {
     let icon = [];
     let temp = [];
     let humidity = [];
-    createHistoryButton();
 
     for (var index = 0; index < forecastLength; index++) {
         // get the next 30 3 hour chunks of weather data... divide by 6 to get 5 "days" worth? it almost works? 
@@ -119,24 +125,12 @@ function buildForecastList(data) {
             // swap day/month/year in date format
             let datearray = dateNoTime.split("-");
             let fixedDate = datearray[1] + '/' + datearray[2] + '/' + datearray[0];
-            
-            // Update Arrays and Local storage
             date.push(fixedDate);
-            storeForecast(fixedDate);
-
             icon.push(data.list[index].weather[0].icon);
-            storeForecast(data.list[index].weather[0].icon);
-
             temp.push(fahrenheit);
-            storeForecast(fahrenheit);
-
             humidity.push(data.list[index].main.humidity);
-            storeForecast(data.list[index].main.humidity);
+            wind.push(data.list[index].wind.speed);
 
-            wind.push();
-            storeForecast(data.list[index].wind.speed);
-
-            // Populate HTML fields
             forecastDate.forEach((el, index) => {
                 forecastDate[index].innerHTML = date[index];
             });
@@ -153,74 +147,83 @@ function buildForecastList(data) {
                 forecastWind[index].innerHTML = wind[index];
             });
         }
-        
     }
-    // console.log('stored weather object', weatherForecast);
         
     // find the forecast divs in the dom and loop thru them and add the data from each date using the index.
 }
 
+
 function createHistoryButton() {
-    showHistory();
-    // get city name to add to button
-    let locationsStore = localStorage.getItem("Locations");
-    var locationsStoreParsed = JSON.parse(locationsStore);
-    if (Array.isArray(locationsStoreParsed)) {
-        let locationsStoreLength = locationsStoreParsed.length;
-        // Use locationsStoreParsed and locationsStoreLength as needed
-        for(var index = 0; index < locationsStoreLength; index++) {
-            let cityName = locationsStoreParsed.slice(-1);
-            console.log('show name of stored cities', cityName);
-            let newButton = document.querySelector(`.historyLink-${cityName}`);
-            let historyWrapper = document.querySelector('.historyWrapper');
-            historyWrapper.innerHTML +=`<button class="historyLink historyLink-${cityName}">${cityName}</button>`;
-            newButton.addEventListener('click', showHistory(locationsStoreParsed[index]));
-        }
-      } else {
-        console.log('no locations stored');
-      }
-}
-// Create button from search history and populate html with data from local storage.
-
-var weatherToday = [];
-var weatherForecast = [];
-var weatherLocations = [];
-
-function store(item) {
-    weatherToday.push(item);
-    localStorage.setItem("Today", JSON.stringify(weatherToday));
+    showHistoryWrapper();
+    let cities = getCitiesFromStorage();
+    let historyWrapper = document.querySelector('.historyWrapper');
+    historyWrapper.innerHTML = '';
+  
+    cities.forEach((cityName) => {
+      historyWrapper.innerHTML += `<button class="historyLink historyLink-${cityName}">${cityName}</button>`;
+      let newButton = document.querySelector(`.historyLink-${cityName}`);
+      newButton.addEventListener('click', () => showHistory(cityName));
+    });
 }
 
-function storeForecast(item) {
-    weatherForecast.push(item);
-    localStorage.setItem("Forecast", JSON.stringify(weatherForecast));
+function removeHistoryButtons() {
+    let buttonContainer = document.querySelector('.historyWrapper');
+    while (buttonContainer.firstChild) {
+        buttonContainer.removeChild(buttonContainer.firstChild);
+    }
 }
 
-function storeLocations(item) { 
-    weatherLocations.push(item);
-    localStorage.setItem("Locations", JSON.stringify(weatherLocations));
-}
+// Clear History Button 
 
-// Need 5 day forecast
-//  .weatherFutureButton shouldn't call the API again.. only use the data thats currently available to produce 5 day look ahead
-
-
-function showHistory(name) {
-    // Remove display none from div
-    const history = document.querySelector('.history');
-    console.log('it works', name);
-    history.classList.remove('d-none');
-}
-
-function clearHistory() {
-    history.classList.add('d-none');
+let clearHistoryButton = document.querySelector('.clearHistory');
+clearHistoryButton.addEventListener('click', () => {
     localStorage.clear();
-    sessionStorage.clear();
+    hideHistory();
+    removeHistoryButtons();
+});
+
+
+function hideHistory() {
+    document.querySelector('.history').classList.remove('d-block');
+    document.querySelector('.history').classList.add('d-none');
 }
 
+function hideError() {
+    document.querySelector('.error').classList.remove('d-block');
+    document.querySelector('.error').classList.add('d-none');
+}
 
-// Current issues 
-// Clear Storage is clearing the browser storage but it isn't working on click because the arrays are saving the data.
+function showError() {
+    document.querySelector('.error').classList.remove('d-none');
+    document.querySelector('.error').classList.add('d-block');
+}
 
-// I'm not getting the city name correclty on the Search history buttons when I populate the button, I need to figure out how to "getItem" from local storage for the buttons
-// After that I can repopulate the today/5-day forecast in the main container.
+function showHistoryWrapper() {
+    document.querySelector('.history').classList.remove('d-none');
+    document.querySelector('.history').classList.add('d-block');
+}
+
+function showHistory(cityName) {
+    let forecasts = getForecastsFromStorage();
+    let forecastData = forecasts.find((data) => data.city === cityName);
+
+    if (forecastData) {
+        // Populate HTML with forecast data
+        document.querySelector('.weatherResultsCity').innerHTML = forecastData.city;
+        document.querySelector('.weatherResultsDate').innerHTML = forecastData.date;
+        document.querySelector('.weatherResultsIcon').src = `http://openweathermap.org/img/w/${forecastData.icon}.png`;
+        document.querySelector('.weatherResultsTemp').innerHTML = forecastData.temp + '&deg;';
+        document.querySelector('.weatherResultsHumidity').innerHTML = forecastData.humidity + '%';
+        document.querySelector('.weatherResultsWind').innerHTML = forecastData.wind + ' mph';
+    }
+}
+
+document.addEventListener('readystatechange', function() {
+    if (document.readyState === "complete") {
+        if(localStorage.length > 0) {
+            showHistoryWrapper();
+            hideError();
+            createHistoryButton();
+        }
+    }
+});

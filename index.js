@@ -13,18 +13,18 @@ let historyLinks = document.querySelectorAll('.historyLink');
 let historyLinksLength = historyLinks.length;
 
 // Creating Stores
-let localStore = localStorage.getItem("Today");
+let localStore = localStorage.getItem("Locations");
 var localStoreParsed = JSON.parse(localStore);
 
 if(localStoreParsed) {
     showHistory(localStoreParsed);
-    createHistoryButton();
+    createHistoryButton(localStore);
 }
 
 // Use weather API
 function callWeather(e) {
     e.preventDefault();
-    const APP_API = 'Put openWeatherAPI key here';
+    const APP_API = '8c2815b4840aae521bf9478cec747275';
     let cityInput = document.querySelector(".cityInput").value;
     // check if city is in local storage, dont call api again if it is.
     if (cityInput === localStorage.getItem('city')) {
@@ -39,7 +39,7 @@ function callWeather(e) {
         console.log(data);
         drawWeather(data);
     }).catch(function(err) {
-        console.log('City not found, please try again.');
+        console.log('City not found, please try again.', err);
     });
 }
 
@@ -81,6 +81,7 @@ function drawWeather(d) {
     document.querySelector('.weatherResultsWind').innerHTML = d.list[0].wind.speed + ' mph';
 
     // Set data to storage
+    storeLocations(d.city.name)
     store(d.city.name);
     store(newDate);
     store(d.list[0].weather[0].icon);
@@ -162,25 +163,28 @@ function buildForecastList(data) {
 function createHistoryButton() {
     showHistory();
     // get city name to add to button
-    let localStore = localStorage.getItem("Today");
-    var localStoreParsed = JSON.parse(localStore);
-    let cityName = localStoreParsed[0];
-
-    let historyWrapper = document.querySelector('.historyWrapper');
-    historyWrapper.innerHTML +=`<button class="historyLink historyLink-${cityName}">${cityName}</button>`;
-    
-    console.log(historyLinksLength);
-
-    for(var index = 0; index < historyLinksLength; index++) {
-        let newButton = document.querySelector(`.historyLink-${cityName}`);
-        newButton.addEventListener('click', showHistory(cityName));
-    }
-
+    let locationsStore = localStorage.getItem("Locations");
+    var locationsStoreParsed = JSON.parse(locationsStore);
+    if (Array.isArray(locationsStoreParsed)) {
+        let locationsStoreLength = locationsStoreParsed.length;
+        // Use locationsStoreParsed and locationsStoreLength as needed
+        for(var index = 0; index < locationsStoreLength; index++) {
+            let cityName = locationsStoreParsed.slice(-1);
+            console.log('show name of stored cities', cityName);
+            let newButton = document.querySelector(`.historyLink-${cityName}`);
+            let historyWrapper = document.querySelector('.historyWrapper');
+            historyWrapper.innerHTML +=`<button class="historyLink historyLink-${cityName}">${cityName}</button>`;
+            newButton.addEventListener('click', showHistory(locationsStoreParsed[index]));
+        }
+      } else {
+        console.log('no locations stored');
+      }
 }
 // Create button from search history and populate html with data from local storage.
 
 var weatherToday = [];
 var weatherForecast = [];
+var weatherLocations = [];
 
 function store(item) {
     weatherToday.push(item);
@@ -190,6 +194,11 @@ function store(item) {
 function storeForecast(item) {
     weatherForecast.push(item);
     localStorage.setItem("Forecast", JSON.stringify(weatherForecast));
+}
+
+function storeLocations(item) { 
+    weatherLocations.push(item);
+    localStorage.setItem("Locations", JSON.stringify(weatherLocations));
 }
 
 // Need 5 day forecast
@@ -206,6 +215,7 @@ function showHistory(name) {
 function clearHistory() {
     history.classList.add('d-none');
     localStorage.clear();
+    sessionStorage.clear();
 }
 
 

@@ -1,0 +1,221 @@
+/* Global Styles */
+:root {
+    --sky-blue: #9AD2E4; /* Pastel sky blue */
+    --light-blue: #BFE9FF; /* Light pastel blue */
+    --dark-blue: #879EBF; /* Muted dark blue */
+    --gray: #A0A0A0; /* Muted gray */
+    --crimson-red: #E57373; /* Pastel crimson red */
+    --orange: #FFB74D; /* Pastel orange */
+    --green: #81C784; /* Pastel green */
+    --amber: #FFD54F; /* Pastel amber */
+}
+
+body {
+    font-family: 'PT Sans', sans-serif;
+    background-color: var(--light-blue);
+    color: var(--dark-blue);
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.row {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.col-3 {
+    flex: 0 0 25%;
+    max-width: 25%;
+}
+
+.col-9 {
+    flex: 0 0 75%;
+    max-width: 75%;
+}
+
+/* Header Section */
+.weatherTitle {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 20px 0;
+    font-size: 24px;
+    font-weight: bold;
+    color: var(--dark-blue);
+}
+
+/* Search Form Section */
+.weatherSearch {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 20px;
+}
+
+.weatherSearch label {
+    font-size: 16px;
+    color: var(--dark-blue);
+    margin-bottom: 10px;
+}
+
+.data-city-input {
+    padding: 8px;
+    border: none;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+.data-city-input::placeholder {
+    color: var(--gray);
+}
+
+button[type="submit"] {
+    background-color: var(--gray);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+button[type="submit"]:hover {
+    background-color: var(--crimson-red);
+}
+
+/* History Section */
+.historyWrapper {
+    display: flex;
+    flex-direction: column;
+}
+
+.historyItem {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.historyButton {
+    background-color: var(--crimson-red);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin: 10px 0;
+}
+
+.historyButton:hover {
+    background-color: var(--orange);
+}
+
+.clearButton {
+    background-color: var(--gray);
+    color: white;
+    border: none;
+    padding: 4px 8px;
+    margin-left: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.clearButton:hover {
+    background-color: var(--crimson-red);
+}
+
+/* Current Weather Section */
+.weatherResultsWrapper {
+    margin: 50px auto;
+    width: 100%;
+}
+
+.weatherResultsCity {
+    font-weight: bold;
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+.weatherResultsDate {
+    font-size: 16px;
+    color: var(--dark-blue);
+    margin-bottom: 10px;
+}
+
+.weatherResultsIcon {
+    width: 75px;
+    margin-bottom: 10px;
+}
+
+.weatherResultsToday {
+    border: 1px solid black;
+    padding: 10px;
+    margin-bottom: 20px;
+    background-color: var(--sky-blue);
+    border-radius: 5px;
+}
+
+.weatherResultsToday p {
+    margin: 5px 0;
+    font-size: 14px;
+    color: var(--dark-blue);
+}
+
+/* Forecast Section */
+.forecastTitle {
+    font-weight: bold;
+    font-size: 20px;
+    margin: 20px 0;
+}
+
+.forecastGroup {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.forecastGroup section {
+    display: flex;
+}
+
+.forecast-card {
+    padding: 10px;
+    background-color: var(--dark-blue);
+    color: white;
+    border-radius: 5px;
+    width: 15%;
+}
+
+.forecast-card p {
+    margin: 5px 0;
+    font-size: 14px;
+}
+
+/* Error Styles */
+.error-message {
+    color: var(--crimson-red);
+}
+
+.error {
+    color: var(--crimson-red);
+}
+
+/* Button Styles */
+.button {
+    background-color: var(--gray);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.button:hover {
+    background-color: var(--crimson-red);
+}
